@@ -10,13 +10,29 @@ const client = axios.create({
 })
 
 /**
- * @param variableName
+ * @param {string} variableName
+ * @return {RegExp}
+ */
+const createRegexp = variableName => new RegExp(`var ${variableName} = "(.*)";`)
+
+/**
+ * @param {String} variableName
  * @return {function(*=): string}
  */
-const createVariableExtractor = variableName => scriptContents => {
-  const rx = new RegExp(`var ${variableName} = "(.*)";`)
+const extractString = variableName => scriptContents => {
+  const rx = createRegexp(variableName)
   const res = rx.exec(scriptContents)
   return res ? res[1].trim() : null
+}
+
+/**
+ * @param {String} variableName
+ * @return {function(*=): number}
+ */
+const extractFloat = variableName => scriptContents => {
+  const rx = createRegexp(variableName)
+  const res = rx.exec(scriptContents)
+  return res ? parseFloat(res[1].trim()) : 0
 }
 
 /**
@@ -36,13 +52,13 @@ const createVariableExtractor = variableName => scriptContents => {
  *  status_c
  */
 const extractors = new Map()
-extractors.set('serialNumber', createVariableExtractor('webdata_sn'))
-extractors.set('firmwareMain', createVariableExtractor('webdata_msvn'))
-extractors.set('firmwareSlave', createVariableExtractor('webdata_ssvn'))
-extractors.set('inverterModel', createVariableExtractor('webdata_pv_type'))
-extractors.set('powerNow', createVariableExtractor('webdata_now_p'))
-extractors.set('powerToday', createVariableExtractor('webdata_today_e'))
-extractors.set('powerTotal', createVariableExtractor('webdata_total_e'))
+extractors.set('serialNumber', extractString('webdata_sn'))
+extractors.set('firmwareMain', extractString('webdata_msvn'))
+extractors.set('firmwareSlave', extractString('webdata_ssvn'))
+extractors.set('inverterModel', extractString('webdata_pv_type'))
+extractors.set('powerNow', extractFloat('webdata_now_p'))
+extractors.set('powerToday', extractFloat('webdata_today_e'))
+extractors.set('powerTotal', extractFloat('webdata_total_e'))
 
 client.get('/status.html')
   .then(resp => {
