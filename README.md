@@ -39,4 +39,4 @@ A simple NodeJS application to read Solis PV inverter data using HTTP interface,
  
  Usage:
  
-`node index.js --address <INVERTER_IP_ADDRESS> --username <INVERTER_WEB_USERNAME> --password <INVERTER_WEB_PASSWORD> --port <LISTEN_PORT>`
+`node index.js --address <INVERTER_IP_ADDRESS> --username <INVERTER_WEB_USERNAME> --password <INVERTER_WEB_PASSWORD> --port <LISTEN_PORT> --interval <REFRESH_INTERVAL (milliseconds, optional, default = 30000)>`
