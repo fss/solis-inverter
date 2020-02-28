@@ -3,6 +3,7 @@ A simple NodeJS application to read Solis PV inverter data using HTTP interface,
 
 ```json
 {
+  "lastSeen": 1582915468053,
   "inverter": {
     "model": "0123",
     "serial": "1234567890ABCDE",
