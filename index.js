@@ -14,8 +14,21 @@ if (!port) {
 
 const solis = new SolisInverterClient(address, username, password)
 
+/**
+ * @type {Object|null}
+ */
 let lastResponse = null
+
+/**
+ * @type {Date|null}
+ */
 let lastDate = null
+
+/**
+ * prevents too frequent loading of data from inverter
+ * @type {number}
+ */
+const minInterval = 20000
 
 /**
  * @param what
@@ -23,9 +36,16 @@ let lastDate = null
 const log = what => console.log([(new Date()).toISOString(), name, what].join(' '))
 
 const server = require('http').createServer((req, res) => {
-  log(`received request from ${req.connection.remoteAddress}`)
+  Promise.resolve()
+    .then(() => {
+      const now = Date.now()
 
-  solis.fetchData()
+      if (lastDate && (now - lastDate.getTime()) < minInterval) {
+        throw new Error('Too many requests')
+      } else {
+        return solis.fetchData()
+      }
+    })
     .then(data => {
       lastResponse = data
       lastDate = new Date()
