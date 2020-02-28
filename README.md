@@ -1,7 +1,5 @@
 # Solis inverter JSON API
-A simple NodeJS application to read Solis PV inverter data using HTTP interface
-
-Using HTTP interface, extracts and prints data in format as below:
+A simple NodeJS application to read Solis PV inverter data using HTTP interface, extract and serve data as JSON formatted as follows:
 
 ```json
 {
