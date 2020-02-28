@@ -1,7 +1,7 @@
 const SolisInverterClient = require('./lib/solis_inverter_client.js')
 const { name } = require('./package.json')
 
-const { address, username, password, port } = require('yargs').argv
+let { address, username, password, port, interval } = require('yargs').argv
 if (!address) {
   console.error('port not given')
   process.exit(1)
@@ -10,6 +10,10 @@ if (!address) {
 if (!port) {
   console.error('port not given')
   process.exit(1)
+}
+
+if (!interval || interval < 30000) {
+  interval = 30000
 }
 
 const solis = new SolisInverterClient(address, username, password)
@@ -22,13 +26,7 @@ let lastResponse = null
 /**
  * @type {Date|null}
  */
-let lastDate = null
-
-/**
- * prevents too frequent loading of data from inverter
- * @type {number}
- */
-const minInterval = 20000
+let lastDate = new Date()
 
 /**
  * @param what
@@ -36,34 +34,13 @@ const minInterval = 20000
 const log = what => console.log([(new Date()).toISOString(), name, what].join(' '))
 
 const server = require('http').createServer((req, res) => {
-  Promise.resolve()
-    .then(() => {
-      const now = Date.now()
-
-      if (lastDate && (now - lastDate.getTime()) < minInterval) {
-        throw new Error('Too many requests')
-      } else {
-        return solis.fetchData()
-      }
-    })
-    .then(data => {
-      lastResponse = data
-      lastDate = new Date()
-
-      res.writeHead(200, { 'Last-Modified': lastDate.toString() })
-      res.end(JSON.stringify(lastResponse))
-    })
-    .catch(error => {
-      log(`got error: ${error}`)
-
-      if (lastResponse) {
-        res.writeHead(200, { 'Last-Modified': lastDate.toString() })
-        res.end(JSON.stringify(lastResponse))
-      } else {
-        res.writeHead(500)
-        res.end(JSON.stringify({ error: error.toString() }))
-      }
-    })
+  if (lastResponse) {
+    res.writeHead(200, { 'Last-Modified': lastDate.toString() })
+    res.end(JSON.stringify(lastResponse))
+  } else {
+    res.writeHead(500)
+    res.end('No data')
+  }
 })
 
 server.listen(port, err => {
@@ -71,5 +48,12 @@ server.listen(port, err => {
     log(`unable to listen on port ${port}: ${err}`)
   } else {
     log(`listening on port ${port}`)
+
+    setInterval(() => {
+      solis.fetchData().then(data => {
+        lastResponse = data
+        lastDate.setTime(Date.now())
+      })
+    }, interval)
   }
 })
