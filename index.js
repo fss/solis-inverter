@@ -48,8 +48,11 @@ const server = require('http').createServer((req, res) => {
  */
 const fetchData = () => inverter.fetchData()
   .then(data => {
-    lastResponse = data
-    lastDate.setTime(Date.now())
+    if (data.inverter.serial && data.inverter.firmwareMain && data.inverter.firmwareSlave) {
+      // only store valid responses
+      lastResponse = data
+      lastDate.setTime(Date.now())
+    }
   })
   .catch(err => log(`Could not fetch data from inverter: ${err}`))
 
