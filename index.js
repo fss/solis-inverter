@@ -8,7 +8,7 @@ if (!address) {
 }
 
 if (!port) {
-  console.error('port not given')
+  console.error('address not given')
   process.exit(1)
 }
 
