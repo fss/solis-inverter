@@ -3,12 +3,12 @@ const { name } = require('./package.json')
 
 let { address, username, password, port, interval } = require('yargs').argv
 if (!address) {
-  console.error('port not given')
+  console.error('address not given')
   process.exit(1)
 }
 
 if (!port) {
-  console.error('address not given')
+  console.error('port not given')
   process.exit(1)
 }
 
