@@ -66,6 +66,6 @@ server.listen(port, err => {
     log(`unable to listen on port ${port}: ${err}`)
   } else {
     log(`listening on port ${port}`)
-    fetchData().then(() => setInterval(fetchData, interval))
+    fetchData().then(() => setInterval(fetchData, interval * 1000))
   }
 })
