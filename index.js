@@ -1,7 +1,16 @@
 const SolisInverterClient = require('./lib/solis_inverter_client.js')
 const { name } = require('./package.json')
 
-let { address, username, password, port, interval } = require('yargs').argv
+let interval = parseInt(process.env.INTERVAL)
+if (isNaN(interval) || interval < 30) {
+  interval = 30
+}
+
+const port = 8000
+const address = process.env.SOLIS_ADDRESS
+const username = process.env.SOLIS_USERNAME
+const password = process.env.SOLIS_PASSWORD
+
 if (!address) {
   console.error('port not given')
   process.exit(1)
@@ -10,10 +19,6 @@ if (!address) {
 if (!port) {
   console.error('port not given')
   process.exit(1)
-}
-
-if (!interval || interval < 30000) {
-  interval = 30000
 }
 
 const inverter = new SolisInverterClient(address, username, password)
