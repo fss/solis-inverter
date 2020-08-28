@@ -12,7 +12,7 @@ const username = process.env.SOLIS_USERNAME
 const password = process.env.SOLIS_PASSWORD
 
 if (!address) {
-  console.error('port not given')
+  console.error('address not given')
   process.exit(1)
 }
 
