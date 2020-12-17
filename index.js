@@ -53,7 +53,7 @@ const server = require('http').createServer((req, res) => {
  */
 const fetchData = () => inverter.fetchData()
   .then(data => {
-    if (data.inverter.serial && data.inverter.firmwareMain && data.inverter.firmwareSlave) {
+    if (data.inverter.serial) {
       // only store valid responses
       lastResponse = data
       lastDate.setTime(Date.now())
