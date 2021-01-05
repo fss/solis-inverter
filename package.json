@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/fss/solis-inverter#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "jsdom": "^16.2.0"
   }
 }
