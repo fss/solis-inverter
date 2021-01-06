@@ -1,6 +1,6 @@
 {
   "name": "solis-inverter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple NodeJS application to read Solis PV inverter data using HTTP interface",
   "main": "index.js",
   "scripts": {
