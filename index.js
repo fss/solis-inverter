@@ -38,7 +38,20 @@ let lastDate = new Date()
  */
 const log = what => console.log([(new Date()).toISOString(), name, what].join(' '))
 
-const server = require('http').createServer((req, res) => {
+/**
+ * @return {Promise}
+ */
+const fetchData = () => inverter.fetchData()
+  .then(response => {
+    if (response && response.inverter && response.inverter.serial) {
+      // only store valid responses
+      lastResponse = response
+      lastDate.setTime(Date.now())
+    }
+  })
+  .catch(err => log(`Could not fetch data from inverter: ${err}`))
+
+require('http').createServer((req, res) => {
   if (lastResponse) {
     res.writeHead(200, { 'Last-Modified': lastDate.toString() })
     res.end(JSON.stringify(lastResponse))
@@ -47,25 +60,11 @@ const server = require('http').createServer((req, res) => {
     res.end('No data')
   }
 })
-
-/**
- * @return {Promise}
- */
-const fetchData = () => inverter.fetchData()
-  .then(data => {
-    if (data.inverter.serial) {
-      // only store valid responses
-      lastResponse = data
-      lastDate.setTime(Date.now())
+  .listen(port, err => {
+    if (err) {
+      log(`unable to listen on port ${port}: ${err}`)
+    } else {
+      log(`listening on port ${port}`)
+      fetchData().then(() => setInterval(fetchData, interval * 1000))
     }
   })
-  .catch(err => log(`Could not fetch data from inverter: ${err}`))
-
-server.listen(port, err => {
-  if (err) {
-    log(`unable to listen on port ${port}: ${err}`)
-  } else {
-    log(`listening on port ${port}`)
-    fetchData().then(() => setInterval(fetchData, interval * 1000))
-  }
-})
