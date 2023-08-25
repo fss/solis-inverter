@@ -41,15 +41,24 @@ const log = what => console.log([(new Date()).toISOString(), name, what].join(' 
 /**
  * @return {Promise}
  */
-const fetchData = () => inverter.fetchData()
-  .then(response => {
-    if (response && response.inverter && response.inverter.serial) {
-      // only store valid responses
-      lastResponse = response
-      lastDate.setTime(Date.now())
-    }
-  })
-  .catch(err => log(`Could not fetch data from inverter: ${err}`))
+const fetchData = () => {
+  log(`fetching data from ${address}...`)
+  return inverter.fetchData()
+    .then(response => {
+      if (!response) {
+        log('no response')
+      } else if (!response.inverter) {
+        log('invalid response (no inverter info)')
+      } else if (!response.inverter.serial) {
+        log('invalid response (no inverter serial)')
+      } else {
+        // only store valid responses
+        lastResponse = response
+        lastDate.setTime(Date.now())
+      }
+    })
+    .catch(err => log(`Could not fetch data from inverter: ${err}`))
+}
 
 require('http').createServer((req, res) => {
   if (lastResponse) {
